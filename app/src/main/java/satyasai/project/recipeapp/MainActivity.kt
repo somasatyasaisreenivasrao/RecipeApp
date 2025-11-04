@@ -7,6 +7,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,11 +28,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import satyasai.project.recipeapp.ui.theme.RecipeAppTheme
 
@@ -41,81 +45,91 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             RecipeAppTheme {
-                IntroScreen()
+                LoadingScreenCheck(::isUserLoggedIn)
             }
+        }
+    }
+
+    private fun isUserLoggedIn(value: Int) {
+
+        when (value) {
+            2 -> {
+                gotoSignInActivity(this)
+            }
+
+        }
+    }
+}
+
+
+@Composable
+fun LoadingScreenCheck(isUserLoggedIn: (value: Int) -> Unit) {
+    var splashValue by remember { mutableStateOf(true) }
+
+    LaunchedEffect(Unit) {
+        delay(3000)
+        splashValue = false
+    }
+
+    if (splashValue) {
+        LoadingScreen()
+    } else {
+        isUserLoggedIn.invoke(2)
+    }
+}
+
+
+@Composable
+fun LoadingScreen() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = colorResource(id = R.color.Violet)),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+
+
+
+            Text(
+                text = "Recipe App",
+                fontSize = 52.sp,
+                fontWeight = FontWeight.Bold,
+                color = colorResource(id = R.color.PureWhite), // Blue text color for "Sign Up"
+
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Image(
+                painter = painterResource(id = R.drawable.ic_recipe),
+                contentDescription = "Recipe App",
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "By Sai Sreenivas",
+                fontSize = 32.sp,
+                fontWeight = FontWeight.Bold,
+                color = colorResource(id = R.color.PureWhite), // Blue text color for "Sign Up"
+
+            )
+
         }
     }
 
 }
 
-@Composable
-fun IntroScreen() {
-    var showSplash by remember { mutableStateOf(true) }
-
-    val context = LocalContext.current as Activity
-
-    LaunchedEffect(Unit) {
-        delay(3000)
-        showSplash = false
-    }
-
-    if (showSplash) {
-        IntroScreenD()
-    } else {
-
-//        context.startActivity(Intent(context, AccountAccessActivity::class.java))
-//        context.finish()
-
-    }
-}
-
-
-@Composable
-fun IntroScreenD() {
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = "Welcome to\nRecipe App",
-            style = MaterialTheme.typography.headlineLarge,
-            color = Color(0xFF5D3FD3),
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(horizontal = 12.dp)
-        )
-
-        Spacer(modifier = Modifier.weight(1f))
-        Image(
-            painter = painterResource(id = R.drawable.ic_recipe), contentDescription = "Food",
-            modifier = Modifier
-                .width(250.dp)
-                .height(250.dp)
-        )
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Text(
-            text = "By\nSatya Sai",
-            style = MaterialTheme.typography.headlineLarge,
-            color = Color(0xFF5D3FD3),
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(horizontal = 12.dp)
-        )
-    }
-}
-
 
 @Preview(showBackground = true)
 @Composable
-fun IntroScreenDPreview() {
-    IntroScreenD()
+fun LoadingScreenPreview() {
+    LoadingScreen()
+}
+
+fun gotoSignInActivity(context: Activity) {
+    context.startActivity(Intent(context, RecipeLoginActivity::class.java))
+    context.finish()
 }
