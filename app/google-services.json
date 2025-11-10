@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "649976505889",
+    "project_id": "recipeapp-587b7",
+    "storage_bucket": "recipeapp-587b7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:649976505889:android:beaf8c8f9d6d5d2d53a560",
+        "android_client_info": {
+          "package_name": "satyasai.s3494432.recipeapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGi0RXN0t90zM9-Z1AcoZ9CradG7KigcI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

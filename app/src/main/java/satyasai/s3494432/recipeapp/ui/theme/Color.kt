@@ -1,4 +1,4 @@
-package satyasai.project.recipeapp.ui.theme
+package satyasai.s3494432.recipeapp.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

@@ -1,12 +1,12 @@
-package satyasai.project.recipeapp
+package satyasai.s3494432.recipeapp
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -37,42 +37,33 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import satyasai.project.recipeapp.ui.theme.RecipeAppTheme
+import com.google.firebase.database.FirebaseDatabase
+import kotlin.jvm.java
 
-
-class RecipeLoginActivity : ComponentActivity() {
+class RecipeRegisterActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            RecipeAppTheme {
-                SignInScreen()
-            }
-
+            SignUpScreen()
         }
     }
 }
 
 
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenPreview() {
-    SignInScreen()
-}
-
 
 @Composable
-fun SignInScreen() {
+fun SignUpScreen() {
+    var name by remember { mutableStateOf("") }
+    var age by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
+    var errorMessage by remember { mutableStateOf("") }
+
 
     val context = LocalContext.current as Activity
-
 
     Column(
         modifier = Modifier
@@ -99,6 +90,34 @@ fun SignInScreen() {
                 .padding(16.dp), // Padding for the fields
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
+            TextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        brush = Brush.horizontalGradient(listOf(Color.Gray, Color.Gray)),
+                        shape = RoundedCornerShape(16.dp)
+                    ),
+                value = name,
+                onValueChange = { name = it },
+                label = { Text("Enter Your Name") }
+            )
+
+            Spacer(modifier = Modifier.height(6.dp)) // Space between fields
+
+            TextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        brush = Brush.horizontalGradient(listOf(Color.Gray, Color.Gray)),
+                        shape = RoundedCornerShape(16.dp)
+                    ),
+                value = age,
+                onValueChange = { age = it },
+                label = { Text("Enter Your Age") }
+            )
+
+            Spacer(modifier = Modifier.height(6.dp)) // Space between fields
 
 
             TextField(
@@ -128,12 +147,49 @@ fun SignInScreen() {
                 label = { Text("Enter Your Password") }
             )
 
-            Spacer(modifier = Modifier.height(24.dp)) // Space between fields and button
+            Spacer(modifier = Modifier.height(24.dp))
 
-            // Sign In Button
+            if (errorMessage.isNotEmpty()) {
+                Text(
+                    text = errorMessage,
+                    color = Color.Red,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(46.dp)) // Space between fields and button
+
             Button(
                 onClick = {
-//                    context.startActivity(Intent(context, HomeActivity::class.java))
+                    when {
+                        name.isBlank() -> {
+                            errorMessage = "Please enter your full name."
+                        }
+
+                        age.isBlank() -> {
+                            errorMessage = "Please enter your Age."
+                        }
+
+                        email.isBlank() -> {
+                            errorMessage = "Please enter your email."
+                        }
+
+                        password.isBlank() -> {
+                            errorMessage = "Please enter your password."
+                        }
+
+
+                        else -> {
+                            errorMessage = ""
+                            val userData = ChefData(
+                                name = name,
+                                email = email,
+                                age = age,
+                                password = password
+                            )
+                            registerChefData(userData,context)
+                        }
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -145,7 +201,7 @@ fun SignInScreen() {
                     )
                 )
             ) {
-                Text(text = "Sign In", fontSize = 16.sp)
+                Text(text = "Sign Up", fontSize = 16.sp)
             }
             Spacer(modifier = Modifier.weight(1f)) // Space between form section and sign-up text
 
@@ -153,16 +209,21 @@ fun SignInScreen() {
             Row(
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
-                Text(text = "You are new ?", fontSize = 14.sp)
+                Text(text = "Already have account ?", fontSize = 14.sp)
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = "Sign Up",
+                    text = "Sign In",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
                     color = colorResource(id = R.color.PureWhite), // Blue text color for "Sign Up"
                     modifier = Modifier.clickable {
-//                        context.startActivity(Intent(context, RecipeRegistrationActivity::class.java))
-//                        context.finish()
+                        context.startActivity(
+                            Intent(
+                                context,
+                                RecipeLoginActivity::class.java
+                            )
+                        )
+                        context.finish()
                     }
                 )
             }
@@ -173,3 +234,44 @@ fun SignInScreen() {
 
     }
 }
+
+
+private fun registerChefData(chefData: ChefData,context: Context){
+    val db = FirebaseDatabase.getInstance()
+    val ref = db.getReference("ChefAccounts")
+    ref.child(chefData.email.replace(".", ",")).setValue(chefData)
+        .addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Toast.makeText(context, "Registration Successful", Toast.LENGTH_SHORT).show()
+
+                context.startActivity(
+                    Intent(
+                        context,
+                        RecipeLoginActivity::class.java
+                    )
+                )
+                (context as Activity).finish()
+            } else {
+                Toast.makeText(
+                    context,
+                    "User Registration Failed: ${task.exception?.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+        .addOnFailureListener { exception ->
+            Toast.makeText(
+                context,
+                "User Registration Failed: ${exception.message}",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+}
+
+data class ChefData
+    (
+    var name: String = "",
+    var age: String ="",
+    var email: String ="",
+    var password: String ="",
+)

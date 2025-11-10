@@ -1,4 +1,4 @@
-package satyasai.project.recipeapp
+package satyasai.s3494432.recipeapp
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
