@@ -72,5 +72,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.firebase.database.ktx)
+    implementation("io.coil-kt:coil-compose:2.2.2")
 
 }
