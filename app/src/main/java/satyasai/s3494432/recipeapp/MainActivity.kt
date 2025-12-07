@@ -22,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -30,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import satyasai.s3494432.recipeapp.ui.theme.RecipeAppTheme
+import kotlin.jvm.java
 
 
 class MainActivity : ComponentActivity() {
@@ -58,6 +60,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun LoadingScreenCheck(isUserLoggedIn: (value: Int) -> Unit) {
     var splashValue by remember { mutableStateOf(true) }
+    val context = LocalContext.current as Activity
+
 
     LaunchedEffect(Unit) {
         delay(3000)
@@ -67,7 +71,13 @@ fun LoadingScreenCheck(isUserLoggedIn: (value: Int) -> Unit) {
     if (splashValue) {
         LoadingScreen()
     } else {
-        isUserLoggedIn.invoke(2)
+        if (UserPrefs.checkLoginStatus(context)) {
+            context.startActivity(Intent(context, HomeActivity::class.java))
+            context.finish()
+        } else {
+            context.startActivity(Intent(context, RecipeLoginActivity::class.java))
+            context.finish()
+        }
     }
 }
 

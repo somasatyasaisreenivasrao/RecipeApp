@@ -226,7 +226,21 @@ fun loginChefAccount(userEmail: String,userPassword: String,context: Context) {
                 chefData?.let {
 
                     if (userPassword == it.password) {
+                        UserPrefs.markLoginStatus(context, true)
+                        UserPrefs.saveEmail(
+                            context,
+                            email = userEmail
+                        )
+                        UserPrefs.saveName(context, it.name)
                         Toast.makeText(context, "Login Successfull", Toast.LENGTH_SHORT).show()
+
+                        context.startActivity(
+                            Intent(
+                                context,
+                                HomeActivity::class.java
+                            )
+                        )
+                        (context as Activity).finish()
                     }
                     else{
                         Toast.makeText(context,"Incorrect Credentials",Toast.LENGTH_SHORT).show()
