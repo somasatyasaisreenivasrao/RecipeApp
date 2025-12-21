@@ -268,10 +268,29 @@ private fun registerChefData(chefData: ChefData,context: Context){
         }
 }
 
-data class ChefData
-    (
+//data class ChefData
+//    (
+//    var name: String = "",
+//    var age: String ="",
+//    var email: String ="",
+//    var password: String ="",
+//)
+
+
+data class ChefData(
     var name: String = "",
-    var age: String ="",
-    var email: String ="",
-    var password: String ="",
+    var age: String = "",
+    var email: String = "",
+    var password: String = "",
+
+    // Profile extras
+    var phone: String = "",
+    var gender: String = "",
+    var location: String = "",
+    var cookingLevel: String = "",
+    var favoriteCuisine: String = "",
+    var dietPreference: String = "",
+    var preferredMeal: String = "",
+    var bio: String = "",
+    var profileImageUrl: String = ""
 )

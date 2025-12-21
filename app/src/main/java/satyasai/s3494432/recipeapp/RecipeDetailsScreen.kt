@@ -89,11 +89,12 @@ fun RecipeDetailsScreen(navController: NavHostController, viewModel: HomeViewMod
                 .background(Color.White)
         ) {
 
-            // --- Top Image Section ---
+
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(280.dp)
+                    .height(320.dp)
             ) {
                 AsyncImage(
                     model = meal.strMealThumb,
@@ -102,11 +103,12 @@ fun RecipeDetailsScreen(navController: NavHostController, viewModel: HomeViewMod
                     modifier = Modifier.fillMaxSize()
                 )
 
-                // Back & Favorite Buttons Row
+
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
+                        .padding(start = 16.dp, end = 16.dp, top = 32.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.Top
                 ) {

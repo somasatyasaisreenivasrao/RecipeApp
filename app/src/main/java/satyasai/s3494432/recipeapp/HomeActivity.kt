@@ -16,6 +16,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,6 +26,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -39,6 +41,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
@@ -67,8 +71,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
-import coil.request.ImageRequest
 import satyasai.s3494432.recipeapp.data.HomeViewModel
+import satyasai.s3494432.recipeapp.ui.theme.Yellow
 import java.util.Locale
 
 class HomeActivity : ComponentActivity() {
@@ -82,7 +86,6 @@ class HomeActivity : ComponentActivity() {
     }
 }
 
-// --------------------------- Navigation Setup ---------------------------
 @Composable
 fun RecipeApp(viewModel: HomeViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
     val navController = rememberNavController()
@@ -94,13 +97,113 @@ fun RecipeApp(viewModel: HomeViewModel = androidx.lifecycle.viewmodel.compose.vi
     }
 }
 
+
+
+@Composable
+fun HomeAppBar(navController: NavHostController) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(color = Yellow)
+            .padding(start = 12.dp, end = 12.dp, top = 32.dp)
+    )
+    {
+        Text(
+            text = "🍳 Cook Book",
+            style = MaterialTheme.typography.headlineMedium,
+            color = Color(0xFF212121),
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(vertical = 8.dp)
+        )
+
+        Spacer(modifier = Modifier.weight(1f))
+        Image(
+            painter = painterResource(id = R.drawable.favorite),
+            contentDescription = "Favorites",
+            modifier = Modifier
+                .size(38.dp)
+                .clickable {
+                    navController.navigate("favorites")
+                }
+                .padding(end = 4.dp)
+        )
+
+        Spacer(modifier = Modifier.width(6.dp))
+
+        Image(
+            painter = painterResource(id = R.drawable.user),
+            contentDescription = "Profile",
+            modifier = Modifier
+                .size(38.dp)
+                .clickable {
+                    navController.navigate("profile")// ✅ navigate to Favorites screen
+                }
+                .padding(end = 4.dp)
+        )
+    }
+}
+
+data class CategoryItem(
+    val name: String,
+    val imageUrl: String
+)
+
+
+@Composable
+fun CategoryImageCard(
+    category: CategoryItem,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .width(120.dp)
+            .padding(6.dp)
+            .clickable { onClick() },
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(
+            if (isSelected) 8.dp else 2.dp
+        )
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(8.dp)
+        ) {
+
+            AsyncImage(
+                model = category.imageUrl,
+                contentDescription = category.name,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(80.dp)
+            )
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            Text(
+                category.name,
+                fontWeight = FontWeight.Medium,
+                fontSize = 14.sp
+            )
+        }
+    }
+}
+
+
 // --------------------------- Home Screen ---------------------------
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel) {
     val context = LocalContext.current
     var query by remember { mutableStateOf("") }
-    var selectedCategory by remember { mutableStateOf("All") }
+//    var selectedCategory by remember { mutableStateOf("All") }
+
+    var selectedMealTime by remember { mutableStateOf("All") }
+    var selectedCategory by remember { mutableStateOf<String?>(null) }
+
+
+    var isVegMode by remember { mutableStateOf(false) }
+
 
     // Voice search launcher
     val voiceLauncher = rememberLauncherForActivityResult(
@@ -120,7 +223,10 @@ fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel) {
 
     fun startVoiceSearch() {
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            putExtra(
+                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+            )
             putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
             putExtra(RecognizerIntent.EXTRA_PROMPT, "Say a recipe name...")
         }
@@ -135,128 +241,182 @@ fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel) {
         viewModel.loadDefaultMeals()
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Brush.verticalGradient(listOf(Color(0xFFF8F9FA), Color(0xFFE3F2FD))))
-            .padding(horizontal = 12.dp, vertical = 8.dp)
-    ) {
-        Row()
-        {
-            Text(
-            text = "🍳 Cook Book",
-            style = MaterialTheme.typography.headlineMedium,
-            color = Color(0xFF212121),
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(vertical = 8.dp)
-        )
-
-            Spacer(modifier = Modifier.weight(1f))
-            Image(
-                painter = painterResource(id = R.drawable.favorite),
-                contentDescription = "Favorites",
-                modifier = Modifier
-                    .size(38.dp)
-                    .clickable {
-                        navController.navigate("favorites")                    }
-                    .padding(end = 4.dp)
-            )
-
-            Spacer(modifier = Modifier.width(6.dp))
-
-            Image(
-                painter = painterResource(id = R.drawable.user),
-                contentDescription = "Profile",
-                modifier = Modifier
-                    .size(38.dp)
-                    .clickable {
-                        navController.navigate("profile")// ✅ navigate to Favorites screen
-                    }
-                    .padding(end = 4.dp)
-            )
+    Scaffold(
+        topBar = {
+            HomeAppBar(navController)
         }
-//
+    ) { innerPadding ->
 
-        // Search bar
-        OutlinedTextField(
-            value = query,
-            onValueChange = { query = it },
-            placeholder = { Text("Search recipes...") },
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp),
-
-            trailingIcon = {
-                Row {
-                    IconButton(onClick = { viewModel.searchMeals(query) }) {
-                        Icon(Icons.Default.Search, contentDescription = "Search")
-                    }
-                    IconButton(onClick = { startVoiceSearch() }) {
-                        Icon(Icons.Default.Mic, contentDescription = "Voice Search")
-                    }
-                }
-            },
-            singleLine = true
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Categories
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceAround
+                .fillMaxSize()
+                .padding(innerPadding)
+                .background(Brush.verticalGradient(listOf(Color(0xFFF8F9FA), Color(0xFFE3F2FD))))
+                .padding(horizontal = 12.dp, vertical = 8.dp)
         ) {
-            val categories = listOf("Breakfast", "Lunch", "Dinner")
-            categories.forEach { category ->
-                CategoryChip(
-                    text = category,
-                    isSelected = selectedCategory == category,
-                    onClick = {
-                        selectedCategory = category
-                        if(selectedCategory=="Lunch"){
-                            viewModel.loadCategory("Chicken")
+
+            OutlinedTextField(
+                value = query,
+                onValueChange = { query = it },
+                placeholder = { Text("Search recipes...") },
+                modifier = Modifier
+                    .fillMaxWidth(),
+
+                trailingIcon = {
+                    Row {
+                        IconButton(onClick = { viewModel.searchMeals(query) }) {
+                            Icon(Icons.Default.Search, contentDescription = "Search")
                         }
-                        else if(selectedCategory=="Dinner")
-                        {
-                            viewModel.loadCategory("Seafood")
+                        IconButton(onClick = { startVoiceSearch() }) {
+                            Icon(Icons.Default.Mic, contentDescription = "Voice Search")
                         }
-                        else
-                        viewModel.loadCategory(category)
                     }
-                )
-            }
-        }
+                },
+                singleLine = true
+            )
 
-        Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-        Crossfade(targetState = viewModel.isLoading) { loading ->
-            if (loading) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = Color(0xFF1E88E5))
+            // Categories
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
+                val mealTimes = listOf("All", "Breakfast", "Lunch", "Dinner")
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceAround
+                ) {
+                    mealTimes.forEach { mealTime ->
+                        CategoryChip(
+                            text = mealTime,
+                            isSelected = selectedMealTime == mealTime,
+                            onClick = {
+                                selectedMealTime = mealTime
+                                selectedCategory = null
+
+                                when (mealTime) {
+                                    "All" -> viewModel.loadDefaultMeals()
+                                    else -> viewModel.loadMealTime(mealTime)
+                                }
+                            }
+                        )
+                    }
                 }
-            } else {
-                if (viewModel.meals.isEmpty()) {
+
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            if (selectedMealTime != "All") {
+
+                val categories = getCategoriesForMealTime(selectedMealTime)
+
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(horizontal = 8.dp)
+                ) {
+                    items(categories) { category ->
+                        CategoryImageCard(
+                            category = category,
+                            isSelected = selectedCategory == category.name,
+                            onClick = {
+                                selectedCategory = category.name
+                                viewModel.loadCategory(category.name)
+                            }
+                        )
+                    }
+                }
+            }
+
+
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+
+            Crossfade(targetState = viewModel.isLoading) { loading ->
+                if (loading) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("No recipes found 😔", color = Color.Gray)
+                        CircularProgressIndicator(color = Color(0xFF1E88E5))
                     }
                 } else {
-                    LazyColumn {
-                        items(viewModel.meals) { meal ->
-                            ImageCard(
-                                imageUrl = meal.strMealThumb,
-                                title = meal.strMeal,
-                                badgeText = meal.idMeal,
-                                onClick = {
-                                    viewModel.getMealDetails(meal.idMeal) {
-                                        navController.navigate("details")
+                    if (viewModel.meals.isEmpty()) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("No recipes found 😔", color = Color.Gray)
+                        }
+                    } else {
+                        LazyColumn {
+//                            items(viewModel.meals) { meal ->
+//                                RecipeItemCard(
+//                                    imageUrl = meal.strMealThumb,
+//                                    title = meal.strMeal,
+//                                    badgeText = meal.idMeal,
+//                                    onClick = {
+//                                        viewModel.getMealDetails(meal.idMeal) {
+//                                            navController.navigate("details")
+//                                        }
+//                                    }
+//                                )
+//                            }
+
+                            items(viewModel.meals) { meal ->
+
+                                RecipeItemCard(
+                                    imageUrl = meal.strMealThumb,
+                                    title = meal.strMeal,
+                                    category = meal.strCategory,
+                                    area = meal.strArea,
+                                    timeTaken = viewModel.estimateTime(meal.strCategory),
+                                    rating = viewModel.getRating(meal.idMeal),
+                                    onViewClick = {
+                                        viewModel.getMealDetails(meal.idMeal) {
+                                            navController.navigate("details")
+                                        }
                                     }
-                                }
-                            )
+                                )
+                            }
+
+
                         }
                     }
                 }
             }
         }
+    }
+}
+
+fun getCategoriesForMealTime(mealTime: String): List<CategoryItem> {
+    return when (mealTime) {
+        "Breakfast" -> listOf(
+            CategoryItem(
+                "Breakfast",
+                "https://www.themealdb.com/images/category/Breakfast.png"
+            )
+        )
+
+        "Lunch" -> listOf(
+            CategoryItem("Chicken", "https://www.themealdb.com/images/category/Chicken.png"),
+            CategoryItem("Beef", "https://www.themealdb.com/images/category/Beef.png"),
+            CategoryItem(
+                "Vegetarian",
+                "https://www.themealdb.com/images/category/Vegetarian.png"
+            )
+        )
+
+        "Dinner" -> listOf(
+            CategoryItem("Seafood", "https://www.themealdb.com/images/category/Seafood.png"),
+            CategoryItem("Chicken", "https://www.themealdb.com/images/category/Chicken.png"),
+            CategoryItem(
+                "Vegetarian",
+                "https://www.themealdb.com/images/category/Vegetarian.png"
+            )
+        )
+
+        else -> emptyList()
     }
 }
 
@@ -282,61 +442,105 @@ fun CategoryChip(text: String, isSelected: Boolean, onClick: () -> Unit) {
     }
 }
 
-// --------------------------- Recipe Card ---------------------------
 @Composable
-fun ImageCard(
+fun RecipeItemCard(
     imageUrl: String,
     title: String,
-    badgeText: String,
+    category: String?,
+    area: String?,
+    timeTaken: String,
+    rating: Float,
     modifier: Modifier = Modifier,
     cardHeight: Dp = 240.dp,
     cornerRadius: Dp = 18.dp,
-    onClick: () -> Unit
+    onViewClick: () -> Unit
 ) {
     Card(
         modifier = modifier
             .fillMaxWidth()
             .height(cardHeight)
             .padding(vertical = 8.dp)
-            .clickable { onClick() },
+            .clickable{
+                onViewClick.invoke()
+            },
         shape = RoundedCornerShape(cornerRadius),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        elevation = CardDefaults.cardElevation(8.dp)
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(Modifier.fillMaxSize()) {
+
+            // Image
             AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(imageUrl)
-                    .crossfade(true)
-                    .build(),
+                model = imageUrl,
                 contentDescription = title,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
 
+            // Gradient
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(80.dp)
+                    .height(100.dp)
                     .align(Alignment.BottomCenter)
                     .background(
                         Brush.verticalGradient(
-                            listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f))
+                            listOf(Color.Transparent, Color.Black.copy(0.75f))
                         )
                     )
             )
 
-            Text(
-                text = title,
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                fontSize = 20.sp,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.align(Alignment.BottomStart).padding(12.dp)
-            )
+            // Category (top-left)
+            category?.let {
+                Surface(
+                    color = Color.Black.copy(alpha = 0.6f),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier
+                        .padding(12.dp)
+                        .align(Alignment.TopStart)
+                ) {
+                    Text(
+                        text = it,
+                        color = Color.White,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                    )
+                }
+            }
+
+            // Bottom content
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(12.dp)
+            ) {
+
+                Text(
+                    text = title,
+                    color = Color.White,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                Spacer(Modifier.height(6.dp))
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    area?.let {
+                        Text("🌍 $it", color = Color.White, fontSize = 13.sp)
+                    }
+                    Text("⏱ $timeTaken", color = Color.White, fontSize = 13.sp)
+                    Text("⭐ ${"%.1f".format(rating)}", color = Color.White, fontSize = 13.sp)
+                }
+
+            }
         }
     }
 }
+
 
 
 @Preview(showBackground = true)

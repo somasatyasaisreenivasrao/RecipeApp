@@ -65,6 +65,36 @@ class HomeViewModel (application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun loadMealTime(mealTime: String) {
+        viewModelScope.launch {
+            isLoading = true
+            meals = when (mealTime) {
+                "Breakfast" -> api.filterByCategory("Breakfast").meals
+                "Lunch" -> api.filterByCategory("Chicken").meals
+                "Dinner" -> api.filterByCategory("Seafood").meals
+                else -> api.searchMeals("chicken").meals
+            } ?: emptyList()
+            isLoading = false
+        }
+    }
+
+
+    fun estimateTime(category: String?): String {
+        return when (category) {
+            "Breakfast" -> "15–20 min"
+            "Dessert" -> "30–40 min"
+            "Seafood" -> "35–45 min"
+            "Chicken", "Beef" -> "40–60 min"
+            else -> "25–35 min"
+        }
+    }
+
+    fun getRating(mealId: String): Float {
+        // UI-only rating (stable per meal)
+        return (3.8f + (mealId.hashCode() % 12) / 10f).coerceIn(3.8f, 4.9f)
+    }
+
+
     fun getMealDetails(mealId: String, onDone: () -> Unit) {
         viewModelScope.launch {
             isLoading = true
@@ -95,6 +125,66 @@ class HomeViewModel (application: Application) : AndroidViewModel(application) {
             dao.insertMeal(favorite)
         }
     }
+
+    fun applyFilters(
+        query: String,
+        category: String?,
+        vegOnly: Boolean
+    ) {
+        viewModelScope.launch {
+            isLoading = true
+
+            val result = when {
+                category != null -> getMealsByCategorySmart(category)
+                query.isNotBlank() -> api.searchMeals(query).meals
+                else -> api.searchMeals("chicken").meals
+            } ?: emptyList()
+
+            meals = if (vegOnly) {
+                result.filter { isVegMeal(it) }
+            } else {
+                result
+            }
+
+            isLoading = false
+        }
+    }
+
+    private fun isVegMeal(meal: Meal): Boolean {
+        val nonVegKeywords = listOf(
+            "chicken", "beef", "pork", "fish", "lamb",
+            "mutton", "seafood", "shrimp", "egg"
+        )
+
+        val ingredients = listOfNotNull(
+            meal.strIngredient1,
+            meal.strIngredient2,
+            meal.strIngredient3,
+            meal.strIngredient4,
+            meal.strIngredient5
+        ).joinToString(" ").lowercase()
+
+        return nonVegKeywords.none { ingredients.contains(it) }
+    }
+
+    private suspend fun getMealsByCategorySmart(category: String): List<Meal> {
+        return when (category) {
+            "Breakfast" -> {
+                api.filterByCategory("Breakfast").meals ?: emptyList()
+            }
+
+            "Lunch" -> {
+                api.filterByCategory("Chicken").meals ?: emptyList()
+            }
+
+            "Dinner" -> {
+                api.filterByCategory("Seafood").meals ?: emptyList()
+            }
+
+            else -> emptyList()
+        }
+    }
+
 
     fun removeFromFavorites(mealId: String) {
         viewModelScope.launch {

@@ -232,6 +232,8 @@ fun loginChefAccount(userEmail: String,userPassword: String,context: Context) {
                             email = userEmail
                         )
                         UserPrefs.saveName(context, it.name)
+                        UserPrefs.savePassword(context,it.password)
+
                         Toast.makeText(context, "Login Successfull", Toast.LENGTH_SHORT).show()
 
                         context.startActivity(
