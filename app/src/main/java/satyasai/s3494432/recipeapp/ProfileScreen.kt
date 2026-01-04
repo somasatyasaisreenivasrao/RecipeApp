@@ -11,13 +11,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,6 +32,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -43,6 +48,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.google.firebase.database.FirebaseDatabase
+import satyasai.s3494432.recipeapp.ui.theme.Yellow
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,7 +57,7 @@ fun ProfileScreen(
     navController: NavHostController
 ) {
     val context = LocalContext.current
-    val emailKey = UserPrefs.getEmail(context).replace(".", ",")
+    val emailKey = AccountUserSp.getEmail(context).replace(".", ",")
 
     val dbRef = FirebaseDatabase.getInstance()
         .getReference("ChefAccounts")
@@ -60,7 +66,6 @@ fun ProfileScreen(
     var isLoading by remember { mutableStateOf(true) }
     var isSaving by remember { mutableStateOf(false) }
 
-    // Profile states
     var name by remember { mutableStateOf("") }
     var age by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -70,7 +75,6 @@ fun ProfileScreen(
     var experience by remember { mutableStateOf("") }
     var favoriteCuisine by remember { mutableStateOf("") }
 
-    // Load profile data
     LaunchedEffect(Unit) {
         dbRef.get().addOnSuccessListener { snapshot ->
             snapshot.getValue(ChefData::class.java)?.let {
@@ -89,13 +93,53 @@ fun ProfileScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("My Profile", fontWeight = FontWeight.Bold) },
+                title = {
+                    Text(
+                        "My Profile",
+                        fontWeight = FontWeight.Bold
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, null)
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = "Back"
+                        )
                     }
-                }
+                },
+                actions = {
+                    AssistChip(
+                        onClick = {
+                            navController.navigate("about_us")
+                        },
+                        label = {
+                            Text(
+                                text = "About App",
+                                fontWeight = FontWeight.Medium
+                            )
+                        },
+                        leadingIcon = {
+                            Icon(
+                                Icons.Default.Info,
+                                contentDescription = "About App",
+                                modifier = Modifier.size(18.dp)
+                            )
+                        },
+                        colors = AssistChipDefaults.assistChipColors(
+                            containerColor = Color.White,
+                            labelColor = Color.Black
+                        ),
+                        shape = RoundedCornerShape(20.dp)
+                    )
+
+                    Spacer(modifier = Modifier.width(8.dp))
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Yellow
+                )
             )
+
+
         }
     ) { padding ->
 
@@ -115,7 +159,6 @@ fun ProfileScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            // Profile Icon
             Box(
                 modifier = Modifier
                     .size(120.dp)
@@ -145,12 +188,11 @@ fun ProfileScreen(
 
             Spacer(Modifier.height(24.dp))
 
-            // Save Button
             Button(
                 onClick = {
                     isSaving = true
                     val updatedChef = ChefData(
-                        name, age, email, UserPrefs.getPassword(context),
+                        name, age, email, AccountUserSp.getPassword(context),
                         phone, location, bio, experience, favoriteCuisine
                     )
 
@@ -170,10 +212,9 @@ fun ProfileScreen(
 
             Spacer(Modifier.height(20.dp))
 
-            // Logout
             OutlinedButton(
                 onClick = {
-                    UserPrefs.markLoginStatus(context,false)
+                    AccountUserSp.markLoginStatus(context,false)
 
                     val intent = Intent(context, RecipeLoginActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK

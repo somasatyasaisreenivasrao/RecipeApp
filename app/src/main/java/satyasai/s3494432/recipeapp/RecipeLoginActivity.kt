@@ -1,6 +1,5 @@
 package satyasai.s3494432.recipeapp
 
-import android.R.attr.name
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -80,9 +79,8 @@ fun SignInScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = colorResource(id = R.color.LitViolet))// Background color for the entire screen // Background color for the entire screen
+            .background(color = colorResource(id = R.color.LitViolet))
     ) {
-        // Top section with an image and blue background
 
         Image(
             modifier = Modifier
@@ -93,13 +91,12 @@ fun SignInScreen() {
         )
 
 
-        // Bottom section with email, password fields, and sign-in button on a white background
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight()
-                .background(color = colorResource(id = R.color.LitViolet))// Background color for the entire screen
-                .padding(16.dp), // Padding for the fields
+                .background(color = colorResource(id = R.color.LitViolet))
+                .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
@@ -116,9 +113,8 @@ fun SignInScreen() {
                 label = { Text("Enter Your Email") }
             )
 
-            Spacer(modifier = Modifier.height(6.dp)) // Space between fields
+            Spacer(modifier = Modifier.height(6.dp))
 
-            // Password Text Field
             TextField(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -141,9 +137,8 @@ fun SignInScreen() {
                 )
             }
 
-            Spacer(modifier = Modifier.height(46.dp)) // Space between fields and button
+            Spacer(modifier = Modifier.height(46.dp))
 
-            // Sign In Button
             Button(
                 onClick = {
                     when {
@@ -179,9 +174,8 @@ fun SignInScreen() {
             ) {
                 Text(text = "Sign In", fontSize = 16.sp)
             }
-            Spacer(modifier = Modifier.weight(1f)) // Space between form section and sign-up text
+            Spacer(modifier = Modifier.weight(1f))
 
-            // Sign Up text section
             Row(
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
@@ -191,7 +185,7 @@ fun SignInScreen() {
                     text = "Sign Up",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
-                    color = colorResource(id = R.color.PureWhite), // Blue text color for "Sign Up"
+                    color = colorResource(id = R.color.PureWhite),
                     modifier = Modifier.clickable {
                         context.startActivity(
                             Intent(
@@ -204,7 +198,7 @@ fun SignInScreen() {
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp)) // Space between fields and button
+            Spacer(modifier = Modifier.height(24.dp))
 
         }
 
@@ -226,13 +220,13 @@ fun loginChefAccount(userEmail: String,userPassword: String,context: Context) {
                 chefData?.let {
 
                     if (userPassword == it.password) {
-                        UserPrefs.markLoginStatus(context, true)
-                        UserPrefs.saveEmail(
+                        AccountUserSp.markLoginStatus(context, true)
+                        AccountUserSp.saveEmail(
                             context,
                             email = userEmail
                         )
-                        UserPrefs.saveName(context, it.name)
-                        UserPrefs.savePassword(context,it.password)
+                        AccountUserSp.saveName(context, it.name)
+                        AccountUserSp.savePassword(context,it.password)
 
                         Toast.makeText(context, "Login Successfull", Toast.LENGTH_SHORT).show()
 

@@ -61,7 +61,7 @@ import satyasai.s3494432.recipeapp.data.Meal
 fun RecipeDetailsScreen(navController: NavHostController, viewModel: HomeViewModel) {
     val meal = viewModel.selectedMeal
     val scrollState = rememberScrollState()
-    val context = LocalContext.current   // ✅ Capture context once
+    val context = LocalContext.current
     var isFavorite by remember { mutableStateOf(false) }
     val favoriteTint by animateColorAsState(
         targetValue = if (isFavorite) Color.Red else Color.White,
@@ -112,7 +112,6 @@ fun RecipeDetailsScreen(navController: NavHostController, viewModel: HomeViewMod
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.Top
                 ) {
-                    // ✅ Back button
                     IconButton(
                         onClick = { navController.popBackStack() },
                         modifier = Modifier
@@ -129,7 +128,6 @@ fun RecipeDetailsScreen(navController: NavHostController, viewModel: HomeViewMod
                         )
                     }
 
-                    // Favorite button
                     IconButton(
                         onClick =
                             {
@@ -158,7 +156,6 @@ fun RecipeDetailsScreen(navController: NavHostController, viewModel: HomeViewMod
                 }
             }
 
-            // --- Recipe Info Section ---
             Column(
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp)
             ) {
@@ -213,7 +210,6 @@ fun RecipeDetailsScreen(navController: NavHostController, viewModel: HomeViewMod
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // --- Ingredients Section ---
                 Text(
                     text = "Ingredients",
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold)
@@ -245,7 +241,6 @@ fun RecipeDetailsScreen(navController: NavHostController, viewModel: HomeViewMod
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // --- Directions Section ---
                 Text(
                     text = "Directions",
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold)
@@ -261,7 +256,6 @@ fun RecipeDetailsScreen(navController: NavHostController, viewModel: HomeViewMod
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // --- Watch Video Button ---
                 Button(
                     onClick = {
                         meal.strYoutube?.let { url ->
@@ -283,7 +277,6 @@ fun RecipeDetailsScreen(navController: NavHostController, viewModel: HomeViewMod
     }
 }
 
-// ---------------- Utility: Extract ingredients + measures from Meal object ----------------
 fun extractIngredients(meal: Meal): List<Pair<String, String>> {
     val list = mutableListOf<Pair<String, String>>()
 
@@ -315,7 +308,6 @@ fun extractIngredients(meal: Meal): List<Pair<String, String>> {
 }
 
 
-// ---------------- Utility: Open YouTube / URL ----------------
 fun openUrl(context: android.content.Context, url: String) {
     try {
         val intent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse(url))

@@ -38,8 +38,44 @@ class HomeViewModel (application: Application) : AndroidViewModel(application) {
     val favorites = _favorites.asStateFlow()
 
     fun loadDefaultMeals() {
-        searchMeals("chicken")
+        loadMultipleDefaultMeals(
+            listOf(
+                "chicken",
+                "pasta",
+                "rice",
+                "vegetarian",
+                "seafood"
+            )
+        )
     }
+
+    private fun loadMultipleDefaultMeals(keywords: List<String>) {
+        viewModelScope.launch {
+            isLoading = true
+
+            val allMeals = mutableListOf<Meal>()
+
+            try {
+                keywords.forEach { keyword ->
+                    val response = api.searchMeals(keyword)
+                    response.meals?.let { meals ->
+                        allMeals.addAll(meals)
+                    }
+                }
+
+                allMeals.shuffled()
+                // Remove duplicates using meal ID
+                meals = allMeals.distinctBy { it.idMeal }
+
+            } catch (e: Exception) {
+                meals = emptyList()
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+
 
     fun searchMeals(query: String) {
         viewModelScope.launch {
@@ -126,29 +162,6 @@ class HomeViewModel (application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun applyFilters(
-        query: String,
-        category: String?,
-        vegOnly: Boolean
-    ) {
-        viewModelScope.launch {
-            isLoading = true
-
-            val result = when {
-                category != null -> getMealsByCategorySmart(category)
-                query.isNotBlank() -> api.searchMeals(query).meals
-                else -> api.searchMeals("chicken").meals
-            } ?: emptyList()
-
-            meals = if (vegOnly) {
-                result.filter { isVegMeal(it) }
-            } else {
-                result
-            }
-
-            isLoading = false
-        }
-    }
 
     private fun isVegMeal(meal: Meal): Boolean {
         val nonVegKeywords = listOf(

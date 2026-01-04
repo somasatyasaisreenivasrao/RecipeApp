@@ -87,13 +87,14 @@ class HomeActivity : ComponentActivity() {
 }
 
 @Composable
-fun RecipeApp(viewModel: HomeViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
+fun RecipeApp(viewModel: HomeViewModel = viewModel()) {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = "home") {
         composable("home") { HomeScreen(navController, viewModel) }
         composable("details") { RecipeDetailsScreen(navController, viewModel) }
         composable("favorites") { FavoritesScreen(navController, viewModel) }
         composable("profile") { ProfileScreen(navController) }
+        composable("about_us") { AboutContactScreen(navController) }
     }
 }
 
@@ -136,7 +137,7 @@ fun HomeAppBar(navController: NavHostController) {
             modifier = Modifier
                 .size(38.dp)
                 .clickable {
-                    navController.navigate("profile")// ✅ navigate to Favorites screen
+                    navController.navigate("profile")
                 }
                 .padding(end = 4.dp)
         )
@@ -190,13 +191,11 @@ fun CategoryImageCard(
 }
 
 
-// --------------------------- Home Screen ---------------------------
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel) {
     val context = LocalContext.current
     var query by remember { mutableStateOf("") }
-//    var selectedCategory by remember { mutableStateOf("All") }
 
     var selectedMealTime by remember { mutableStateOf("All") }
     var selectedCategory by remember { mutableStateOf<String?>(null) }
@@ -205,7 +204,6 @@ fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel) {
     var isVegMode by remember { mutableStateOf(false) }
 
 
-    // Voice search launcher
     val voiceLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -350,18 +348,6 @@ fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel) {
                         }
                     } else {
                         LazyColumn {
-//                            items(viewModel.meals) { meal ->
-//                                RecipeItemCard(
-//                                    imageUrl = meal.strMealThumb,
-//                                    title = meal.strMeal,
-//                                    badgeText = meal.idMeal,
-//                                    onClick = {
-//                                        viewModel.getMealDetails(meal.idMeal) {
-//                                            navController.navigate("details")
-//                                        }
-//                                    }
-//                                )
-//                            }
 
                             items(viewModel.meals) { meal ->
 
@@ -468,7 +454,6 @@ fun RecipeItemCard(
     ) {
         Box(Modifier.fillMaxSize()) {
 
-            // Image
             AsyncImage(
                 model = imageUrl,
                 contentDescription = title,
@@ -476,7 +461,6 @@ fun RecipeItemCard(
                 modifier = Modifier.fillMaxSize()
             )
 
-            // Gradient
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -489,7 +473,6 @@ fun RecipeItemCard(
                     )
             )
 
-            // Category (top-left)
             category?.let {
                 Surface(
                     color = Color.Black.copy(alpha = 0.6f),
@@ -507,7 +490,6 @@ fun RecipeItemCard(
                 }
             }
 
-            // Bottom content
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomStart)

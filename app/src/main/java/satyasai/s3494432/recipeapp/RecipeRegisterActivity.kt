@@ -68,9 +68,8 @@ fun SignUpScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = colorResource(id = R.color.LitViolet))// Background color for the entire screen // Background color for the entire screen
+            .background(color = colorResource(id = R.color.LitViolet))
     ) {
-        // Top section with an image and blue background
 
         Image(
             modifier = Modifier
@@ -81,13 +80,12 @@ fun SignUpScreen() {
         )
 
 
-        // Bottom section with email, password fields, and sign-in button on a white background
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight()
-                .background(color = colorResource(id = R.color.LitViolet))// Background color for the entire screen
-                .padding(16.dp), // Padding for the fields
+                .background(color = colorResource(id = R.color.LitViolet))
+                .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
@@ -103,7 +101,7 @@ fun SignUpScreen() {
                 label = { Text("Enter Your Name") }
             )
 
-            Spacer(modifier = Modifier.height(6.dp)) // Space between fields
+            Spacer(modifier = Modifier.height(6.dp))
 
             TextField(
                 modifier = Modifier
@@ -117,7 +115,7 @@ fun SignUpScreen() {
                 label = { Text("Enter Your Age") }
             )
 
-            Spacer(modifier = Modifier.height(6.dp)) // Space between fields
+            Spacer(modifier = Modifier.height(6.dp))
 
 
             TextField(
@@ -132,9 +130,8 @@ fun SignUpScreen() {
                 label = { Text("Enter Your Email") }
             )
 
-            Spacer(modifier = Modifier.height(6.dp)) // Space between fields
+            Spacer(modifier = Modifier.height(6.dp))
 
-            // Password Text Field
             TextField(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -157,7 +154,7 @@ fun SignUpScreen() {
                 )
             }
 
-            Spacer(modifier = Modifier.height(46.dp)) // Space between fields and button
+            Spacer(modifier = Modifier.height(46.dp))
 
             Button(
                 onClick = {
@@ -203,9 +200,8 @@ fun SignUpScreen() {
             ) {
                 Text(text = "Sign Up", fontSize = 16.sp)
             }
-            Spacer(modifier = Modifier.weight(1f)) // Space between form section and sign-up text
+            Spacer(modifier = Modifier.weight(1f))
 
-            // Sign Up text section
             Row(
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
@@ -215,7 +211,7 @@ fun SignUpScreen() {
                     text = "Sign In",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
-                    color = colorResource(id = R.color.PureWhite), // Blue text color for "Sign Up"
+                    color = colorResource(id = R.color.PureWhite),
                     modifier = Modifier.clickable {
                         context.startActivity(
                             Intent(
@@ -228,7 +224,7 @@ fun SignUpScreen() {
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp)) // Space between fields and button
+            Spacer(modifier = Modifier.height(24.dp))
 
         }
 
@@ -268,14 +264,6 @@ private fun registerChefData(chefData: ChefData,context: Context){
         }
 }
 
-//data class ChefData
-//    (
-//    var name: String = "",
-//    var age: String ="",
-//    var email: String ="",
-//    var password: String ="",
-//)
-
 
 data class ChefData(
     var name: String = "",
@@ -283,7 +271,6 @@ data class ChefData(
     var email: String = "",
     var password: String = "",
 
-    // Profile extras
     var phone: String = "",
     var gender: String = "",
     var location: String = "",

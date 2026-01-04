@@ -3,7 +3,7 @@ package satyasai.s3494432.recipeapp
 import android.content.Context
 
 
-object UserPrefs {
+object AccountUserSp {
 
     private const val PREFS_NAME = "POST_PREFS"
     private const val KEY_IS_USER_LOGGED_IN = "KEY_IS_USER_LOGGED_IN"

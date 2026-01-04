@@ -71,7 +71,7 @@ fun LoadingScreenCheck(isUserLoggedIn: (value: Int) -> Unit) {
     if (splashValue) {
         LoadingScreen()
     } else {
-        if (UserPrefs.checkLoginStatus(context)) {
+        if (AccountUserSp.checkLoginStatus(context)) {
             context.startActivity(Intent(context, HomeActivity::class.java))
             context.finish()
         } else {
@@ -100,7 +100,7 @@ fun LoadingScreen() {
                 text = "Recipe App",
                 fontSize = 52.sp,
                 fontWeight = FontWeight.Bold,
-                color = colorResource(id = R.color.PureWhite), // Blue text color for "Sign Up"
+                color = colorResource(id = R.color.PureWhite),
 
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -116,7 +116,7 @@ fun LoadingScreen() {
                 text = "By Sai Sreenivas",
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
-                color = colorResource(id = R.color.PureWhite), // Blue text color for "Sign Up"
+                color = colorResource(id = R.color.PureWhite),
 
             )
 

@@ -51,7 +51,7 @@ fun FavoritesScreen(
     navController: NavHostController,
     viewModel: HomeViewModel
 ) {
-    val favorites by viewModel.favorites.collectAsState() // Live favorites from Room
+    val favorites by viewModel.favorites.collectAsState()
     val context = LocalContext.current
 
     Scaffold(
@@ -95,7 +95,6 @@ fun FavoritesScreen(
                     FavoriteCard(
                         meal = meal,
                         onClick = {
-                            // Load details & navigate to details screen
                             viewModel.getMealDetails(meal.idMeal) {
                                 navController.navigate("details")
                             }
